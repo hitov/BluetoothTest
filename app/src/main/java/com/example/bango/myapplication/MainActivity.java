@@ -7,8 +7,11 @@ import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.os.Handler;
+import android.os.Message;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -36,6 +39,41 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
+
+        debug = (TextView) findViewById(R.id.textDebug);
+        status = (TextView) findViewById(R.id.textStatus);
+
+        findViewById(R.id.restart).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                connectService();
+            }
+        });
+
+        elevation = (SeekBar) findViewById(R.id.seekBar);
+        elevation.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                Log.d("Seekbar","onStopTrackingTouch ");
+                int progress = seekBar.getProgress();
+                String p = String.valueOf(progress);
+                debug.setText(p);
+                bt.sendMessage(p);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                Log.d("Seekbar","onStartTrackingTouch ");
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                Log.d("Seekbar", "onProgressChanged " + progress);
+            }
+        });
+
+        bt = new Bluetooth(this, mHandler);
+        connectService();
 
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -69,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if (bluetoothAdapter.isEnabled()) {
                 bt.start();
-                bt.connectDevice("HC-06");
+                bt.connectDevice("Mobilinkdx TNC1");
                 Log.d(TAG, "Btservice started - listening");
                 status.setText("Connected");
             } else {
